@@ -1,2 +1,1 @@
-# orac
-The Oracle
+mvn clean compile assembly:single
