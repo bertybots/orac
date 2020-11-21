@@ -5,11 +5,12 @@
         "cwd":"/home/orac/orac/",
         "script":"/usr/bin/java",
         "args":[
-            "-jar",
-            "/home/orac/orac/CurveBuilder.jar com.orac.SwapPricer"
+            "-cp",
+            "/home/orac/orac/CurveBuilder.jar",
+            "com.orac.SwapPricer"
         ],
         "watch":[
-            "/home/orac/orac/CurveBuilder.jar com.orac.SwapPricer"
+            "/home/orac/orac/CurveBuilder.jar"
         ],
         "node_args":[],
         "log_date_format":"YYYY-MM-DD HH:mm Z",
