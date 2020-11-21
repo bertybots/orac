@@ -2,7 +2,7 @@
     "apps":[
     {
         "name":"java-curve-builder",
-        "cwd":".",
+        "cwd":"/home/orac/orac/",
         "script":"/usr/bin/java",
         "args":[
             "-jar",
