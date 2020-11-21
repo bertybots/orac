@@ -1,20 +1,20 @@
 {
-    “apps”:[
+    "apps":[
     {
-        “name”:”java-curve-builder”,
-        “cwd”:”.”,
-        “script”:”/usr/bin/java”,
-        “args”:[
-            “-jar”,
-            “/home/orac/orac/CurveBuilder.jar com.orac.SwapPricer”
+        "name":"java-curve-builder",
+        "cwd":".",
+        "script":"/usr/bin/java",
+        "args":[
+            "-jar",
+            "/home/orac/orac/CurveBuilder.jar com.orac.SwapPricer"
         ],
-        “watch”:[
-            “/home/orac/orac/CurveBuilder.jar com.orac.SwapPricer”
+        "watch":[
+            "/home/orac/orac/CurveBuilder.jar com.orac.SwapPricer"
         ],
-        “node_args”:[],
-        “log_date_format”:”YYYY-MM-DD HH:mm Z”,
-        “exec_interpreter”:””,
-        “exec_mode”:”fork”
+        "node_args":[],
+        "log_date_format":"YYYY-MM-DD HH:mm Z",
+        "exec_interpreter":"",
+        "exec_mode":"fork"
      }
    ]
 }
