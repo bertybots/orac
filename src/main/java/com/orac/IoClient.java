@@ -19,6 +19,15 @@ public class IoClient {
             }
         });
         ts.start();
+
+        boolean running = true;
+        while (running) {
+            try {
+                Thread.sleep(1000);
+                System.out.println("Still here...");
+            } catch (Exception ex) {
+            }
+        }
     }
 
     public static void runServer() {
@@ -37,5 +46,6 @@ public class IoClient {
         } catch (Exception ex) {
 
         }
+
     }
 }
