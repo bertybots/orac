@@ -1,10 +1,13 @@
 package com.orac;
 
+import java.util.Iterator;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import io.socket.client.*;
 
 public class IoClient {
-    static final int PORT = 9292;
-
     public static void main(String[] args) {
         System.out.println("Starting Server");
 
@@ -40,12 +43,36 @@ public class IoClient {
                 System.out.println("Disconnected from Server");
             });
             socket.on("curve", args -> {
-                System.out.println("Let's Build a curve");
+                System.out.println("Curve Build...");
+                JSONObject jsonObject = (JSONObject) args[0];
+
+                Iterator<String> keys = jsonObject.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    try {
+                        JSONObject obj = (JSONObject) jsonObject.get(key);
+                        String name = (String) obj.get("name");
+                        Double value = (Double) obj.get("value");
+                        System.out.println("Got Name: " + name + ", Value: " + value);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                System.out.println("Curve Publish");
+
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("curve", "server");
+                    obj.put("binary", new byte[42]);
+                    socket.emit("cooked", obj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             });
             socket.connect();
-        } catch (Exception ex) {
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
     }
 }
