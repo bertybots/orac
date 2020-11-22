@@ -95,10 +95,18 @@ public class MultiCurve {
         quotes = ImmutableMarketData.builder(VALUATION_DATE).values(map).build();
     }
 
-    public void calibrate() {
-        long lastTime = System.currentTimeMillis();
-        curves = CALIBRATOR.calibrate(configs.get(CONFIG_NAME), quotes, REF_DATA);
-        System.out.println("Calibration Time: " + (System.currentTimeMillis() - lastTime));
+    public ImmutableRatesProvider calibrate() {
+        try {
+            long lastTime = System.currentTimeMillis();
+            curves = CALIBRATOR.calibrate(configs.get(CONFIG_NAME), quotes, REF_DATA);
+            System.out.println("Calibration Time: " + (System.currentTimeMillis() - lastTime));
+            return curves;
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error Calibrating Curves: " + e.toString());
+            return null;
+        }
     }
 
     public void valueSwap() {

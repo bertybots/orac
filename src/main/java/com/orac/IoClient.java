@@ -4,8 +4,10 @@ import java.util.Iterator;
 
 import com.google.common.collect.ImmutableMap;
 import com.opengamma.strata.basics.StandardId;
+import com.opengamma.strata.basics.currency.Currency;
 import com.opengamma.strata.data.FieldName;
 import com.opengamma.strata.market.observable.QuoteId;
+import com.opengamma.strata.pricer.ZeroRateDiscountFactors;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,15 +48,16 @@ public class IoClient {
             var socket = IO.socket("http://localhost:8200");
             socket.on(Socket.EVENT_CONNECT, args -> {
                 System.out.println("Connectd to Server");
+                socket.emit("listen", "curveInputs");
             });
             socket.on(Socket.EVENT_DISCONNECT, args -> {
                 System.out.println("Disconnected from Server");
             });
-            socket.on("curve", args -> {
+            socket.on("curveInputs", args -> {
                 System.out.println("Curve Build...");
                 JSONObject jsonObject = (JSONObject) args[0];
 
-                ImmutableMap.Builder<QuoteId, Double> builder = ImmutableMap.builder();      
+                ImmutableMap.Builder<QuoteId, Double> builder = ImmutableMap.builder();
 
                 Iterator<String> keys = jsonObject.keys();
                 while (keys.hasNext()) {
@@ -67,25 +70,39 @@ public class IoClient {
 
                         StandardId id = StandardId.of("OG-Ticker", name);
                         builder.put(QuoteId.of(id, FieldName.MARKET_VALUE), value);
-        
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
 
                 mc.setLiveMD(builder.build());
-                mc.calibrate();
+                var curves = mc.calibrate();
+
+                var dt = (System.currentTimeMillis() / 86_400_000.0) + 25569;
+
+                if (curves != null) {
+                    try {
+                        JSONObject dfs = new JSONObject();
+                        ZeroRateDiscountFactors df = (ZeroRateDiscountFactors) curves.discountFactors(Currency.EUR);
+                        for (int x = 1; x <= 50; x++) {
+                            double y = df.getCurve().yValue(x);
+                            String label = x + "Y";
+                            JSONObject value = new JSONObject();
+                            value.put("name", label);
+                            value.put("value", y);
+                            value.put("excelDate", dt);
+                            value.put("username", "orac");
+                            dfs.put(label, value);
+                        }
+                        System.out.println("Got some discount factors");
+                        socket.emit("cooked", dfs);
+                    } catch (JSONException e) {
+                        System.out.println("Error getting factors: " + e.toString());
+                    }
+                }
 
                 System.out.println("Curve Publish");
-
-                try {
-                    JSONObject obj = new JSONObject();
-                    obj.put("curve", "server");
-                    obj.put("binary", new byte[42]);
-                    socket.emit("cooked", obj);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
             });
             socket.connect();
         } catch (Exception e) {
