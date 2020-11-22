@@ -7,7 +7,7 @@
         "args":[
             "-cp",
             "/home/orac/orac/CurveBuilder.jar",
-            "com.orac.SwapPricer"
+            "com.orac.IoClient"
         ],
         "watch":[
             "/home/orac/orac/CurveBuilder.jar"
