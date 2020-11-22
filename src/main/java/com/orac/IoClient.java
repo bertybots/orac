@@ -2,6 +2,11 @@ package com.orac;
 
 import java.util.Iterator;
 
+import com.google.common.collect.ImmutableMap;
+import com.opengamma.strata.basics.StandardId;
+import com.opengamma.strata.data.FieldName;
+import com.opengamma.strata.market.observable.QuoteId;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,6 +39,9 @@ public class IoClient {
     }
 
     public static void runServer() {
+        MultiCurve mc = new MultiCurve();
+        mc.loadCurveDefiniations();
+
         try {
             var socket = IO.socket("http://localhost:8200");
             socket.on(Socket.EVENT_CONNECT, args -> {
@@ -46,6 +54,8 @@ public class IoClient {
                 System.out.println("Curve Build...");
                 JSONObject jsonObject = (JSONObject) args[0];
 
+                ImmutableMap.Builder<QuoteId, Double> builder = ImmutableMap.builder();      
+
                 Iterator<String> keys = jsonObject.keys();
                 while (keys.hasNext()) {
                     String key = keys.next();
@@ -54,10 +64,17 @@ public class IoClient {
                         String name = (String) obj.get("name");
                         Double value = (Double) obj.get("value");
                         System.out.println("Got Name: " + name + ", Value: " + value);
+
+                        StandardId id = StandardId.of("OG-Ticker", name);
+                        builder.put(QuoteId.of(id, FieldName.MARKET_VALUE), value);
+        
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
+
+                mc.setLiveMD(builder.build());
+                mc.calibrate();
 
                 System.out.println("Curve Publish");
 

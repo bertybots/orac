@@ -5,7 +5,7 @@ cp .\target\CurveBuilder-1.0-SNAPSHOT-jar-with-dependencies.jar CurveBuilder.jar
 
 Run Manually
 
-java -cp CurveBuilder.jar com.orac.SwapPricer
+java -cp CurveBuilder.jar com.orac.IoClient 
 
 Run in pm2
 
