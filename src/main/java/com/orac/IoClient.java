@@ -65,7 +65,13 @@ public class IoClient {
                     try {
                         JSONObject obj = (JSONObject) jsonObject.get(key);
                         String name = (String) obj.get("name");
-                        Double value = (Double) obj.get("value");
+                        Object inputValue = obj.get("value");
+                        Double value;
+                        if (inputValue instanceof Double) {
+                            value = (Double)inputValue;
+                        } else {
+                            value = ((Integer)inputValue).doubleValue();
+                        }
                         System.out.println("Got Name: " + name + ", Value: " + value);
 
                         StandardId id = StandardId.of("OG-Ticker", name);
@@ -81,9 +87,9 @@ public class IoClient {
 
                 var dt = (System.currentTimeMillis() / 86_400_000.0) + 25569;
 
+                JSONObject dfs = new JSONObject();
                 if (curves != null) {
                     try {
-                        JSONObject dfs = new JSONObject();
                         ZeroRateDiscountFactors df = (ZeroRateDiscountFactors) curves.discountFactors(Currency.EUR);
                         for (int x = 1; x <= 50; x++) {
                             double y = df.getCurve().yValue(x);
@@ -95,14 +101,13 @@ public class IoClient {
                             value.put("username", "orac");
                             dfs.put(label, value);
                         }
-                        System.out.println("Got some discount factors");
-                        socket.emit("cooked", dfs);
+                        System.out.println("Got some discount factors...");
                     } catch (JSONException e) {
                         System.out.println("Error getting factors: " + e.toString());
                     }
                 }
-
-                System.out.println("Curve Publish");
+                socket.emit("cooked", dfs);
+                System.out.println("Curve Done.");
             });
             socket.connect();
         } catch (Exception e) {
